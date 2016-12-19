@@ -18,7 +18,14 @@ func TestHello(t *testing.T) {
 }
 
 func TestGetAllSources(t *testing.T) {
-	_, err := met.GetSources()
+	_, err := met.GetAllSources()
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestGetAllElements(t *testing.T) {
+	_, err := met.GetAllElements()
 	if err != nil {
 		t.Error(err)
 	}

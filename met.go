@@ -24,15 +24,29 @@ type Response struct {
 }
 
 type Data struct {
-	Id            string `json:"id"`
-	Name          string `json:"name"`
-	Country       string `json:"country"`
-	SourceID      string `json:"sourceId"`
-	Geometry      `json:"geometry"`
-	Levels        []Level       `json:"levels"`
-	ReferenceTime time.Time     `json:"referenceTime"`
-	Observations  []Observation `json:"observations"`
-	ValidFrom     string        `json:"validFrom"`
+	Id                    string `json:"id"`
+	Name                  string `json:"name"`
+	Country               string `json:"country"`
+	SourceID              string `json:"sourceId"`
+	Geometry              `json:"geometry"`
+	Levels                []Level       `json:"levels"`
+	ReferenceTime         time.Time     `json:"referenceTime"`
+	Observations          []Observation `json:"observations"`
+	ValidFrom             string        `json:"validFrom"`
+	LegacyMetNoConvention `json:"legacyMetNoConvention"`
+	CfConvention          `json:"cfConvention"`
+}
+
+type CfConvention struct {
+	StandardName string `json:"standardName"`
+	Unit         string `json:"unit"`
+	Status       string `json:"status"`
+}
+
+type LegacyMetNoConvention struct {
+	ElemCodes []string `json:"elemCodes"`
+	Category  string   `json:"category"`
+	Unit      string   `json:"unit"`
 }
 
 type Level struct {

@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-func GetAllSources() ([]Data, error) {
-	endpoint := baseUrl + "/sources/v0.jsonld"
+func GetAllElements() ([]Data, error) {
+	endpoint := baseUrl + "/elements/v0.jsonld"
 	id, err := getClientId()
 	if err != nil {
 		return []Data{}, err
