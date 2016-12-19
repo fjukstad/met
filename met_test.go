@@ -16,3 +16,10 @@ func TestHello(t *testing.T) {
 		t.Error(text)
 	}
 }
+
+func TestGetAllSources(t *testing.T) {
+	_, err := met.GetSources()
+	if err != nil {
+		t.Error(err)
+	}
+}
