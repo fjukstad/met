@@ -2,6 +2,8 @@ package met
 
 import (
 	"errors"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"time"
 )
@@ -80,4 +82,31 @@ func getClientId() (string, error) {
 		return "", errors.New("CLIENT_ID not set")
 	}
 	return id, nil
+}
+
+func get(endpoint string) ([]byte, error) {
+	id, err := getClientId()
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.SetBasicAuth(id, "")
+
+	c := http.Client{}
+
+	resp, err := c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
 }

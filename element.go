@@ -1,33 +1,10 @@
 package met
 
-import (
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
-)
+import "encoding/json"
 
 func GetAllElements() ([]Data, error) {
 	endpoint := baseUrl + "/elements/v0.jsonld"
-	id, err := getClientId()
-	if err != nil {
-		return []Data{}, err
-	}
-
-	req, err := http.NewRequest("GET", endpoint, nil)
-	if err != nil {
-		return []Data{}, err
-	}
-
-	req.SetBasicAuth(id, "")
-
-	c := http.Client{}
-
-	resp, err := c.Do(req)
-	if err != nil {
-		return []Data{}, err
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := get(endpoint)
 	if err != nil {
 		return []Data{}, err
 	}
