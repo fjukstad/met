@@ -29,7 +29,6 @@ func TestGetAllElements(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 }
 
 func TestGetObservations(t *testing.T) {
@@ -40,6 +39,13 @@ func TestGetObservations(t *testing.T) {
 	}
 
 	_, err := met.GetObservations(f)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestGetAllLocations(t *testing.T) {
+	_, err := met.GetAllLocations()
 	if err != nil {
 		t.Error(err)
 	}
