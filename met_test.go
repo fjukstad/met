@@ -24,6 +24,30 @@ func TestGetAllSources(t *testing.T) {
 	}
 }
 
+func TestGetTromsoSources(t *testing.T) {
+	f := met.Filter{
+		Geometry: "nearest(POINT (18.958503 69.655747))",
+	}
+
+	data, err := met.GetSources(f)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(data) > 1 {
+		t.Error("Multiple sources for tromso")
+	}
+
+	tromso := data[0]
+
+	if tromso.Id != "SN90450" {
+		t.Error("Tromsø source does not have the correct id")
+	}
+
+	// Could also check the other fields as well.
+
+}
+
 func TestGetAllElements(t *testing.T) {
 	_, err := met.GetAllElements()
 	if err != nil {

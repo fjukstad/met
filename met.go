@@ -4,7 +4,9 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -74,6 +76,19 @@ type Geometry struct {
 	Interpolated bool      `json:"interpolated"`
 }
 
+type Filter struct {
+	Sources               []string
+	ReferenceTime         string
+	Elements              []string
+	PerformanceCategories []string
+	ExposureCategories    []string
+	Fields                []string
+	Ids                   []string
+	Types                 []string
+	Geometry              string
+	ValidTime             string
+}
+
 var baseUrl = "https://data.met.no"
 
 func getClientId() (string, error) {
@@ -109,4 +124,59 @@ func get(endpoint string) ([]byte, error) {
 		return nil, err
 	}
 	return body, nil
+}
+
+func createUrl(endpoint string, f Filter) string {
+
+	sources := strings.Join(f.Sources, ",")
+	elements := strings.Join(f.Elements, ",")
+	performanceCategories := strings.Join(f.PerformanceCategories, ",")
+	exposureCategories := strings.Join(f.ExposureCategories, ",")
+	fields := strings.Join(f.Fields, ",")
+	ids := strings.Join(f.Fields, ",")
+	types := strings.Join(f.Types, ",")
+
+	v := url.Values{}
+
+	if len(sources) > 0 {
+		v.Add("sources", sources)
+	}
+
+	if len(elements) > 0 {
+		v.Add("elements", elements)
+	}
+
+	if f.ReferenceTime != "" {
+		v.Add("referencetime", f.ReferenceTime)
+	}
+
+	if len(performanceCategories) > 0 {
+		v.Add("performancecategory", performanceCategories)
+	}
+
+	if len(exposureCategories) > 0 {
+		v.Add("exposurecategory", exposureCategories)
+	}
+
+	if len(fields) > 0 {
+		v.Add("fields", fields)
+	}
+
+	if len(ids) > 0 {
+		v.Add("ids", ids)
+	}
+
+	if len(types) > 0 {
+		v.Add("types", types)
+	}
+
+	if f.Geometry != "" {
+		v.Add("geometry", f.Geometry)
+	}
+
+	if f.ValidTime != "" {
+		v.Add("validtime", f.ValidTime)
+	}
+
+	return endpoint + v.Encode()
 }
