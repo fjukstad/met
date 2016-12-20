@@ -16,20 +16,20 @@ import (
 )
 
 type Response struct {
-	Context          string    `json:"@context"`
-	Type             string    `json:"@type"`
-	APIVersion       string    `json:"apiVersion"`
-	License          string    `json:"license"`
-	CreatedAt        time.Time `json:"createdAt"`
-	QueryTime        float64   `json:"queryTime"`
-	CurrentItemCount int       `json:"currentItemCount"`
-	ItemsPerPage     int       `json:"itemsPerPage"`
-	Offset           int       `json:"offset"`
-	TotalItemCount   int       `json:"totalItemCount"`
-	NextLink         string    `json:"nextLink"`
-	PreviousLink     string    `json:"previousLink"`
-	CurrentLink      string    `json:"currentLink"`
-	Data             []Data    `json:"data"`
+	Context          string  `json:"@context"`
+	Type             string  `json:"@type"`
+	APIVersion       string  `json:"apiVersion"`
+	License          string  `json:"license"`
+	CreatedAt        Time    `json:"createdAt"`
+	QueryTime        float64 `json:"queryTime"`
+	CurrentItemCount int     `json:"currentItemCount"`
+	ItemsPerPage     int     `json:"itemsPerPage"`
+	Offset           int     `json:"offset"`
+	TotalItemCount   int     `json:"totalItemCount"`
+	NextLink         string  `json:"nextLink"`
+	PreviousLink     string  `json:"previousLink"`
+	CurrentLink      string  `json:"currentLink"`
+	Data             []Data  `json:"data"`
 }
 
 type Data struct {
@@ -39,7 +39,7 @@ type Data struct {
 	SourceID              string `json:"sourceId"`
 	Geometry              `json:"geometry"`
 	Levels                `json:"levels"`
-	ReferenceTime         time.Time `json:"referenceTime"`
+	ReferenceTime         Time `json:"referenceTime"`
 	Observations          `json:"observations"`
 	ValidFrom             string `json:"validFrom"`
 	LegacyMetNoConvention `json:"legacyMetNoConvention"`
@@ -98,6 +98,32 @@ type Filter struct {
 	ValidTime             string
 }
 
+type Time struct {
+	time.Time
+}
+
+// Homemade unmarshaling of time since met follows
+func (t *Time) UnmarshalJSON(b []byte) error {
+	var err error
+	var parsed time.Time
+
+	raw := string(b)
+	raw = strings.TrimLeft(raw, "\"")
+	raw = strings.TrimRight(raw, "\"")
+
+	parsed, err = time.Parse("2006-01-02T15:04:05.000Z", raw)
+	if err != nil {
+		parsed, err = time.Parse("2006-01-02T15:04:05Z", raw)
+		if err != nil {
+			return errors.New("Could not parse date: " + raw)
+		}
+	}
+
+	*t = Time{parsed}
+
+	return nil
+}
+
 func (l Level) String() string {
 	return "LevelType: " + l.LevelType + " Value: " + strconv.Itoa(l.Value) + " Unit: " + l.Unit
 }
@@ -109,25 +135,27 @@ func (ls Levels) String() string {
 }
 
 func (g *Geometry) String() string {
-	lat := strconv.FormatFloat(g.Coordinates[0], '.', -1, 64)
-	long := strconv.FormatFloat(g.Coordinates[1], '.', -1, 64)
+	lat := strconv.FormatFloat(g.Coordinates[0], 'f', -1, 64)
+	long := strconv.FormatFloat(g.Coordinates[1], 'f', -1, 64)
 	return "Type: " + g.Type + "Coordinates: " + lat + "," + long
 }
 
-func (o *Observation) String() string {
-	v := strconv.FormatFloat(o.Value, '.', -1, 64)
+func (o Observation) String() string {
+
+	v := strconv.FormatFloat(o.Value, 'f', -1, 64)
 	qc := strconv.Itoa(o.QualityCode)
+
 	return "ElementId: " + o.ElementId +
-		"Value: " + v +
-		"Unit: " + o.Unit +
-		"CodeTable: " + o.CodeTable +
-		"Performance Category: " + o.PerformanceCategory +
-		"Quality Code: " + qc +
-		"DataVersion:" + o.DataVersion
+		" Value: " + v +
+		" Unit: " + o.Unit +
+		" CodeTable: " + o.CodeTable +
+		" Performance Category: " + o.PerformanceCategory +
+		" Quality Code: " + qc +
+		" DataVersion:" + o.DataVersion
 
 }
 
-func (obs *Observations) String() string {
+func (obs Observations) String() string {
 	return sliceToString("\n", obs)
 }
 
