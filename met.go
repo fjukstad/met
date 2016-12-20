@@ -58,14 +58,14 @@ type Level struct {
 }
 
 type Observation struct {
-	ElementID           string `json:"elementId"`
-	Value               string `json:"value"`
-	Unit                string `json:"unit"`
-	CodeTable           string `json:"codeTable"`
-	PerformanceCategory string `json:"performanceCategory"`
-	ExposureCategory    string `json:"exposureCategory"`
-	QualityCode         string `json:"qualityCode"`
-	DataVersion         string `json:"dataVersion"`
+	ElementID           string  `json:"elementId"`
+	Value               float64 `json:"value"`
+	Unit                string  `json:"unit"`
+	CodeTable           string  `json:"codeTable"`
+	PerformanceCategory string  `json:"performanceCategory"`
+	ExposureCategory    string  `json:"exposureCategory"`
+	QualityCode         int     `json:"qualityCode"`
+	DataVersion         string  `json:"dataVersion"`
 }
 
 type Geometry struct {
