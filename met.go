@@ -1,6 +1,7 @@
 package met
 
 import (
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -76,6 +77,8 @@ type Geometry struct {
 	Interpolated bool      `json:"interpolated"`
 }
 
+// Use Filter to set different query parameters. See https://data.met.no/docs
+// for more information. Some queries require some of the parameters set.
 type Filter struct {
 	Sources               []string
 	ReferenceTime         string
@@ -117,6 +120,22 @@ func get(endpoint string) ([]byte, error) {
 	resp, err := c.Do(req)
 	if err != nil {
 		return nil, err
+	}
+
+	if resp.StatusCode == 400 {
+		return nil, errors.New("Invalid parameter value or malformed request.")
+	}
+
+	if resp.StatusCode == 401 {
+		return nil, errors.New("Unauthorized client ID.")
+	}
+
+	if resp.StatusCode == 404 {
+		return nil, errors.New("No data was found for the list of query Ids.")
+	}
+
+	if resp.StatusCode == 400 {
+		return nil, errors.New("Internal server error.")
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -179,4 +198,20 @@ func createUrl(endpoint string, f Filter) string {
 	}
 
 	return endpoint + v.Encode()
+}
+
+func getData(u string) ([]Data, error) {
+	body, err := get(u)
+	if err != nil {
+		return []Data{}, err
+	}
+	var response Response
+
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return []Data{}, err
+	}
+
+	return response.Data, nil
+
 }
