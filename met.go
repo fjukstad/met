@@ -1,12 +1,16 @@
 package met
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
+	"reflect"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -34,10 +38,10 @@ type Data struct {
 	Country               string `json:"country"`
 	SourceID              string `json:"sourceId"`
 	Geometry              `json:"geometry"`
-	Levels                []Level       `json:"levels"`
-	ReferenceTime         time.Time     `json:"referenceTime"`
-	Observations          []Observation `json:"observations"`
-	ValidFrom             string        `json:"validFrom"`
+	Levels                `json:"levels"`
+	ReferenceTime         time.Time `json:"referenceTime"`
+	Observations          `json:"observations"`
+	ValidFrom             string `json:"validFrom"`
 	LegacyMetNoConvention `json:"legacyMetNoConvention"`
 	CfConvention          `json:"cfConvention"`
 }
@@ -61,7 +65,7 @@ type Level struct {
 }
 
 type Observation struct {
-	ElementID           string  `json:"elementId"`
+	ElementId           string  `json:"elementId"`
 	Value               float64 `json:"value"`
 	Unit                string  `json:"unit"`
 	CodeTable           string  `json:"codeTable"`
@@ -70,6 +74,8 @@ type Observation struct {
 	QualityCode         int     `json:"qualityCode"`
 	DataVersion         string  `json:"dataVersion"`
 }
+
+type Observations []Observation
 
 type Geometry struct {
 	Type         string    `json:"@type"`
@@ -90,6 +96,64 @@ type Filter struct {
 	Types                 []string
 	Geometry              string
 	ValidTime             string
+}
+
+func (l Level) String() string {
+	return "LevelType: " + l.LevelType + " Value: " + strconv.Itoa(l.Value) + " Unit: " + l.Unit
+}
+
+type Levels []Level
+
+func (ls Levels) String() string {
+	return sliceToString("\n", ls)
+}
+
+func (g *Geometry) String() string {
+	lat := strconv.FormatFloat(g.Coordinates[0], '.', -1, 64)
+	long := strconv.FormatFloat(g.Coordinates[1], '.', -1, 64)
+	return "Type: " + g.Type + "Coordinates: " + lat + "," + long
+}
+
+func (o *Observation) String() string {
+	v := strconv.FormatFloat(o.Value, '.', -1, 64)
+	qc := strconv.Itoa(o.QualityCode)
+	return "ElementId: " + o.ElementId +
+		"Value: " + v +
+		"Unit: " + o.Unit +
+		"CodeTable: " + o.CodeTable +
+		"Performance Category: " + o.PerformanceCategory +
+		"Quality Code: " + qc +
+		"DataVersion:" + o.DataVersion
+
+}
+
+func (obs *Observations) String() string {
+	return sliceToString("\n", obs)
+}
+
+func sliceToString(sep string, t interface{}) string {
+	buf := new(bytes.Buffer)
+	switch reflect.TypeOf(t).Kind() {
+	case reflect.Slice:
+		s := reflect.ValueOf(t)
+		for i := 0; i < s.Len(); i++ {
+			if i > 0 {
+				buf.WriteString(sep)
+			}
+			item := s.Index(i).Interface()
+			fmt.Fprint(buf, item)
+		}
+	}
+	return buf.String()
+}
+
+func (lmnc *LegacyMetNoConvention) String() string {
+	return "ElemCodes" + sliceToString(",", lmnc.ElemCodes) + "Category: " + lmnc.Category + "Unit: " + lmnc.Unit
+}
+
+func (cc *CfConvention) String() string {
+	return "StandardName: " + cc.StandardName + " Unit: " + cc.Unit +
+		" Status:" + cc.Status
 }
 
 var baseUrl = "https://data.met.no"
@@ -214,4 +278,20 @@ func getData(u string) ([]Data, error) {
 
 	return response.Data, nil
 
+}
+
+func (d *Data) String() string {
+	str := "Id: " + d.Id +
+		"\nName: " + d.Name +
+		"\nCountry: " + d.Country +
+		"\nSourceId: " + d.SourceID +
+		"\nGeometry: " + d.Geometry.String() +
+		"\nLevels: " + d.Levels.String() +
+		"\nReferenceTime: " + d.ReferenceTime.String() +
+		"\nObservations: " + d.Observations.String() +
+		"\nValidFrom: " + d.ValidFrom +
+		"\nLegacyMetNoConvention: " + d.LegacyMetNoConvention.String() +
+		"\nCfConvention: " + d.CfConvention.String()
+
+	return str
 }
