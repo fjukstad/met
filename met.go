@@ -16,20 +16,20 @@ import (
 )
 
 type Response struct {
-	Context          string  `json:"@context"`
-	Type             string  `json:"@type"`
-	APIVersion       string  `json:"apiVersion"`
-	License          string  `json:"license"`
-	CreatedAt        Time    `json:"createdAt"`
-	QueryTime        float64 `json:"queryTime"`
-	CurrentItemCount int     `json:"currentItemCount"`
-	ItemsPerPage     int     `json:"itemsPerPage"`
-	Offset           int     `json:"offset"`
-	TotalItemCount   int     `json:"totalItemCount"`
-	NextLink         string  `json:"nextLink"`
-	PreviousLink     string  `json:"previousLink"`
-	CurrentLink      string  `json:"currentLink"`
-	Data             []Data  `json:"data"`
+	Context          string    `json:"@context"`
+	Type             string    `json:"@type"`
+	APIVersion       string    `json:"apiVersion"`
+	License          string    `json:"license"`
+	CreatedAt        time.Time `json:"createdAt"`
+	QueryTime        float64   `json:"queryTime"`
+	CurrentItemCount int       `json:"currentItemCount"`
+	ItemsPerPage     int       `json:"itemsPerPage"`
+	Offset           int       `json:"offset"`
+	TotalItemCount   int       `json:"totalItemCount"`
+	NextLink         string    `json:"nextLink"`
+	PreviousLink     string    `json:"previousLink"`
+	CurrentLink      string    `json:"currentLink"`
+	Data             []Data    `json:"data"`
 }
 
 type Data struct {
@@ -39,7 +39,7 @@ type Data struct {
 	SourceID              string `json:"sourceId"`
 	Geometry              `json:"geometry"`
 	Levels                `json:"levels"`
-	ReferenceTime         Time `json:"referenceTime"`
+	ReferenceTime         time.Time `json:"referenceTime"`
 	Observations          `json:"observations"`
 	ValidFrom             string `json:"validFrom"`
 	LegacyMetNoConvention `json:"legacyMetNoConvention"`
@@ -96,32 +96,6 @@ type Filter struct {
 	Types                 []string
 	Geometry              string
 	ValidTime             string
-}
-
-type Time struct {
-	time.Time
-}
-
-// Homemade unmarshaling of time since met follows
-func (t *Time) UnmarshalJSON(b []byte) error {
-	var err error
-	var parsed time.Time
-
-	raw := string(b)
-	raw = strings.TrimLeft(raw, "\"")
-	raw = strings.TrimRight(raw, "\"")
-
-	parsed, err = time.Parse("2006-01-02T15:04:05.000Z", raw)
-	if err != nil {
-		parsed, err = time.Parse("2006-01-02T15:04:05Z", raw)
-		if err != nil {
-			return errors.New("Could not parse date: " + raw)
-		}
-	}
-
-	*t = Time{parsed}
-
-	return nil
 }
 
 func (l Level) String() string {
