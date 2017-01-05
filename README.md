@@ -5,7 +5,7 @@ this package are still in development.
 # Setup
 Before you can use the met package you'll have to request client credentials
 from data.met.no [here](https://data.met.no/auth/requestCredentials.html), and
-store them in an environment variable `CLIENT_ID`. 
+store them in an environment variable `MET_CLIENT_ID`. 
 
 # Example
 Get monthly precipitation at climate station Blindern for 2016 (until Dec. 21).  

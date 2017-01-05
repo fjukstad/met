@@ -161,9 +161,9 @@ func (cc *CfConvention) String() string {
 var baseUrl = "https://data.met.no"
 
 func getClientId() (string, error) {
-	id := os.Getenv("CLIENT_ID")
+	id := os.Getenv("MET_CLIENT_ID")
 	if id == "" {
-		return "", errors.New("CLIENT_ID not set")
+		return "", errors.New("MET_CLIENT_ID not set")
 	}
 	return id, nil
 }
