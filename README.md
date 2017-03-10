@@ -24,7 +24,7 @@ func main() {
 	f := met.Filter{
 		Sources:       []string{"SN18700"}, // Oslo Blindern
 		ReferenceTime: "2016-01-01T00:00:00.000Z/2016-12-21T00:00:00.000Z",
-		Elements:      []string{"sum(precipitation_amount 1M)"},
+		Elements:      []string{"sum(precipitation_amount P1M)"},
 	}
 
 	data, err := met.GetObservations(f)
