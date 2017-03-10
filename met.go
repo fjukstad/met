@@ -218,7 +218,7 @@ func createUrl(endpoint string, f Filter) string {
 	performanceCategories := strings.Join(f.PerformanceCategories, ",")
 	exposureCategories := strings.Join(f.ExposureCategories, ",")
 	fields := strings.Join(f.Fields, ",")
-	ids := strings.Join(f.Fields, ",")
+	ids := strings.Join(f.Ids, ",")
 	types := strings.Join(f.Types, ",")
 
 	v := url.Values{}
