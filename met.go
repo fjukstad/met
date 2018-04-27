@@ -158,7 +158,7 @@ func (cc *CfConvention) String() string {
 		" Status:" + cc.Status
 }
 
-var baseUrl = "https://data.met.no"
+var baseUrl = "https://frost.met.no"
 
 func getClientId() (string, error) {
 	id := os.Getenv("MET_CLIENT_ID")
